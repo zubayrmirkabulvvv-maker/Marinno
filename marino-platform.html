@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MARINO — Shashlik & Ko'mir</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #fafafa;
+    --pink: #e8a0a0;
+    --pink-light: #f5d5d5;
+    --pink-dark: #c46060;
+    --gray: #888;
+    --border: rgba(232,160,160,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 0.5px solid var(--border);
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+  .nav-logo span { color: var(--pink); }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links li a {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+    text-decoration: none;
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+
+  .nav-links li a:hover,
+  .nav-links li a.active {
+    color: var(--pink);
+  }
+
+  /* ── PAGES ── */
+  .page {
+    display: none;
+    min-height: 100vh;
+    padding-top: 80px;
+    animation: fadeIn 0.5s ease;
+  }
+  .page.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ══════════════════════════════
+     HOME PAGE
+  ══════════════════════════════ */
+  #home {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 0 48px;
+    overflow: hidden;
+  }
+
+  .hero-bg-circle {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,160,160,0.12) 0%, transparent 70%);
+    right: -100px; top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 20px;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(56px, 8vw, 96px);
+    font-weight: 900;
+    line-height: 1.0;
+    max-width: 700px;
+    margin-bottom: 32px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--pink);
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: var(--gray);
+    max-width: 440px;
+    line-height: 1.8;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .btn-primary {
+    background: var(--pink);
+    color: var(--black);
+    border: none;
+    padding: 14px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.25s, transform 0.15s;
+  }
+  .btn-primary:hover {
+    background: var(--pink-light);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--white);
+    border: 0.5px solid rgba(255,255,255,0.2);
+    padding: 14px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.25s, color 0.25s;
+  }
+  .btn-ghost:hover {
+    border-color: var(--pink);
+    color: var(--pink);
+  }
+
+  .hero-stats {
+    position: absolute;
+    right: 48px;
+    bottom: 80px;
+    display: flex;
+    gap: 48px;
+  }
+
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--white);
+    display: block;
+  }
+  .stat-lbl {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+
+  .hero-line {
+    position: absolute;
+    left: 48px;
+    bottom: 0;
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, var(--pink), transparent);
+  }
+
+  /* ══════════════════════════════
+     ABOUT PAGE
+  ══════════════════════════════ */
+  #about { padding: 80px 48px 80px; }
+
+  .about-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    margin-bottom: 80px;
+    padding-top: 40px;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .section-title em {
+    font-style: italic;
+    color: var(--pink);
+  }
+
+  .about-text {
+    font-size: 15px;
+    color: rgba(250,250,250,0.65);
+    line-height: 1.9;
+    font-weight: 300;
+  }
+
+  .about-text p { margin-bottom: 16px; }
+
+  /* Big stats strip */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 0.5px solid var(--border);
+    margin-bottom: 80px;
+  }
+
+  .strip-stat {
+    padding: 40px 32px;
+    border-right: 0.5px solid var(--border);
+    transition: background 0.3s;
+  }
+  .strip-stat:last-child { border-right: none; }
+  .strip-stat:hover { background: rgba(232,160,160,0.06); }
+
+  .strip-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--white);
+    display: block;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .strip-num span { color: var(--pink); font-size: 32px; }
+
+  .strip-lbl {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+
+  /* Cards */
+  .about-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 0.5px solid var(--border);
+  }
+
+  .about-card {
+    background: var(--black);
+    padding: 40px 32px;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .about-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--pink);
+    transform: scaleX(0);
+    transition: transform 0.35s;
+    transform-origin: left;
+  }
+  .about-card:hover::before { transform: scaleX(1); }
+  .about-card:hover { background: rgba(232,160,160,0.04); }
+
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .card-desc {
+    font-size: 14px;
+    color: rgba(250,250,250,0.5);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* Timeline */
+  .timeline {
+    margin-top: 80px;
+    padding-top: 60px;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .timeline-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 48px;
+  }
+
+  .timeline-items { position: relative; padding-left: 32px; }
+  .timeline-items::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--pink), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 36px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -36px;
+    top: 6px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--pink);
+  }
+
+  .t-year {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--pink);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .t-event {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .t-detail {
+    font-size: 13px;
+    color: var(--gray);
+    font-weight: 300;
+  }
+
+  /* ══════════════════════════════
+     MENU PAGE
+  ══════════════════════════════ */
+  #menu { padding: 80px 48px; }
+
+  .menu-header {
+    padding-top: 40px;
+    border-top: 0.5px solid var(--border);
+    margin-bottom: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .menu-categories {
+    display: flex;
+    gap: 0;
+    margin-bottom: 48px;
+    border: 0.5px solid var(--border);
+    width: fit-content;
+  }
+
+  .cat-btn {
+    padding: 10px 24px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--gray);
+    border: none;
+    border-right: 0.5px solid var(--border);
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cat-btn:last-child { border-right: none; }
+  .cat-btn.active, .cat-btn:hover {
+    background: var(--pink);
+    color: var(--black);
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 0.5px solid var(--border);
+  }
+
+  .menu-item {
+    background: var(--black);
+    padding: 32px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: background 0.25s;
+    cursor: pointer;
+  }
+  .menu-item:hover { background: rgba(232,160,160,0.06); }
+
+  .menu-item-info {}
+  .menu-item-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .menu-item-desc {
+    font-size: 12px;
+    color: var(--gray);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .menu-item-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--pink);
+    white-space: nowrap;
+    margin-left: 16px;
+  }
+
+  /* ══════════════════════════════
+     BUYURTMA PAGE
+  ══════════════════════════════ */
+  #order { padding: 80px 48px; }
+
+  .order-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    padding-top: 40px;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .form-group { margin-bottom: 24px; }
+
+  .form-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 8px;
+  }
+
+  .form-input {
+    width: 100%;
+    background: transparent;
+    border: 0.5px solid rgba(255,255,255,0.15);
+    color: var(--white);
+    padding: 14px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.25s;
+  }
+  .form-input:focus { border-color: var(--pink); }
+  .form-input::placeholder { color: rgba(255,255,255,0.2); }
+
+  select.form-input option { background: var(--black); color: var(--white); }
+
+  .order-summary {
+    background: rgba(232,160,160,0.05);
+    border: 0.5px solid var(--border);
+    padding: 36px;
+  }
+
+  .summary-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    font-size: 14px;
+  }
+  .summary-row .label { color: var(--gray); }
+  .summary-row .value { font-weight: 500; }
+
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 0.5px solid var(--border);
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .summary-total .price { color: var(--pink); }
+
+  /* ══════════════════════════════
+     CONTACT PAGE
+  ══════════════════════════════ */
+  #contact { padding: 80px 48px; }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    padding-top: 40px;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .contact-info-block {
+    margin-bottom: 36px;
+  }
+
+  .contact-info-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 10px;
+  }
+
+  .contact-info-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .contact-info-sub {
+    font-size: 13px;
+    color: var(--gray);
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  .branches-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .branch-tag {
+    border: 0.5px solid var(--border);
+    padding: 10px 16px;
+    font-size: 13px;
+    color: rgba(250,250,250,0.6);
+    transition: border-color 0.25s, color 0.25s;
+  }
+  .branch-tag:hover {
+    border-color: var(--pink);
+    color: var(--pink);
+  }
+
+  /* ══════════════════════════════
+     FOOTER
+  ══════════════════════════════ */
+  footer {
+    border-top: 0.5px solid var(--border);
+    padding: 32px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+  .footer-logo span { color: var(--pink); }
+
+  .footer-copy {
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 1px;
+  }
+
+  /* ══════════════════════════════
+     NOTIFICATION TOAST
+  ══════════════════════════════ */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--pink);
+    color: var(--black);
+    padding: 14px 28px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    z-index: 9998;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    #home, #about, #menu, #order, #contact { padding-left: 20px; padding-right: 20px; }
+    .about-header, .contact-grid, .order-grid { grid-template-columns: 1fr; gap: 40px; }
+    .stats-strip, .menu-grid, .about-cards { grid-template-columns: 1fr 1fr; }
+    .hero-stats { position: static; margin-top: 48px; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">MAR<span>I</span>NO</div>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('home')" class="active" id="nav-home">Bosh sahifa</a></li>
+    <li><a href="#" onclick="showPage('about')" id="nav-about">Marino haqida</a></li>
+    <li><a href="#" onclick="showPage('menu')" id="nav-menu">Menyu</a></li>
+    <li><a href="#" onclick="showPage('order')" id="nav-order">Buyurtma</a></li>
+    <li><a href="#" onclick="showPage('contact')" id="nav-contact">Aloqa</a></li>
+  </ul>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast">Buyurtma qabul qilindi!</div>
+
+<!-- ══ HOME ══ -->
+<div class="page active" id="home">
+  <div class="hero-bg-circle"></div>
+  <div class="hero-line"></div>
+
+  <p class="hero-eyebrow">Toshkentning №1 Shashlik Markazi</p>
+  <h1 class="hero-title">
+    Haqiqiy<br>
+    <em>lazzat</em><br>
+    sizi kutmoqda
+  </h1>
+  <p class="hero-desc">
+    Ko'mir va shashlik uchun zarur barcha mahsulotlar — sifat kafolati bilan. 33 ta filial, Toshkent bo'ylab.
+  </p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="showPage('order')">Buyurtma berish</button>
+    <button class="btn-ghost" onclick="showPage('about')">Biz haqimizda</button>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <span class="stat-num">33</span>
+      <div class="stat-lbl">Filial</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">500<span style="font-size:24px;color:var(--pink)">+</span></span>
+      <div class="stat-lbl">Kunlik mijoz</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">100<span style="font-size:24px;color:var(--pink)">%</span></span>
+      <div class="stat-lbl">Sifat kafolati</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ABOUT ══ -->
+<div class="page" id="about">
+  <div class="about-header">
+    <div>
+      <p class="section-label">Marino haqida</p>
+      <h2 class="section-title">
+        Shashlik<br>san'ati —<br>
+        <em>bizning ishimiz</em>
+      </h2>
+    </div>
+    <div class="about-text">
+      <p>Marino — Toshkentdagi eng yirik shashlik va ko'mir savdo tarmog'i. Biz har kuni 500 dan 700 gacha mijozga xizmat ko'rsatamiz, Toshkent bo'ylab 33 ta filialimiz orqali.</p>
+      <p>Ko'mir, shashlik go'shti, ziravorlar, mangal va boshqa zarur jihozlar — hammasi bir joyda, yuqori sifat kafolati bilan.</p>
+      <p>Maqsadimiz oddiy: har bir mijoz to'g'ri mahsulot, to'g'ri narxda olsin. Shashlik mavsumida ham, butun yil davomida ham.</p>
+    </div>
+  </div>
+
+  <!-- Stats Strip -->
+  <div class="stats-strip">
+    <div class="strip-stat">
+      <span class="strip-num">33<span>+</span></span>
+      <div class="strip-lbl">Filial Toshkentda</div>
+    </div>
+    <div class="strip-stat">
+      <span class="strip-num">500<span>–700</span></span>
+      <div class="strip-lbl">Kunlik mijoz</div>
+    </div>
+    <div class="strip-stat">
+      <span class="strip-num">5<span>+</span></span>
+      <div class="strip-lbl">Yillik tajriba</div>
+    </div>
+    <div class="strip-stat">
+      <span class="strip-num">100<span>%</span></span>
+      <div class="strip-lbl">Tabiiy ko'mir</div>
+    </div>
+  </div>
+
+  <!-- Cards -->
+  <div class="about-cards">
+    <div class="about-card">
+      <span class="card-icon">🔥</span>
+      <div class="card-title">Premium Ko'mir</div>
+      <div class="card-desc">Qayin va eman daraxtidan tayyorlangan, tez yonadigan va uzoq tutadigan tabiiy ko'mir. Shashlik uchun eng to'g'ri tanlov.</div>
+    </div>
+    <div class="about-card">
+      <span class="card-icon">🥩</span>
+      <div class="card-title">Sifatli Go'sht</div>
+      <div class="card-desc">Qo'y, mol va tovuq go'shti — kuniga yangi keltiriladi. Shashlik uchun maxsus kesimlar, tayyor marinadlar.</div>
+    </div>
+    <div class="about-card">
+      <span class="card-icon">🛒</span>
+      <div class="card-title">Hamma Narsa Bir Joyda</div>
+      <div class="card-desc">Ko'mir, shashlik, ziravorlar, mangal, shampurlar, qog'oz tarelkalar — shashlik bayramingiz uchun kerak bo'lgan hammasi.</div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline">
+    <h3 class="timeline-title">Marino tarixi</h3>
+    <div class="timeline-items">
+      <div class="timeline-item">
+        <div class="t-year">Boshlang'ich</div>
+        <div class="t-event">Birinchi Marino do'koni ochildi</div>
+        <div class="t-detail">Toshkentda bitta kichik do'kondan boshladik</div>
+      </div>
+      <div class="timeline-item">
+        <div class="t-year">O'sish</div>
+        <div class="t-event">10 ta filialga yetdik</div>
+        <div class="t-detail">Toshkentning har bir tumanida mavjudlik</div>
+      </div>
+      <div class="timeline-item">
+        <div class="t-year">Kengayish</div>
+        <div class="t-event">Delivery xizmati boshlandi</div>
+        <div class="t-detail">Uyingizga yetkazib berish imkoniyati qo'shildi</div>
+      </div>
+      <div class="timeline-item">
+        <div class="t-year">Bugun</div>
+        <div class="t-event">33 ta filial, 500–700 kunlik mijoz</div>
+        <div class="t-detail">Toshkentning №1 shashlik va ko'mir markazi</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MENU ══ -->
+<div class="page" id="menu">
+  <div class="menu-header">
+    <div>
+      <p class="section-label">Mahsulotlar</p>
+      <h2 class="section-title">Bizning <em>menyu</em></h2>
+    </div>
+  </div>
+
+  <div class="menu-categories">
+    <button class="cat-btn active" onclick="filterMenu('all', this)">Hammasi</button>
+    <button class="cat-btn" onclick="filterMenu('komir', this)">Ko'mir</button>
+    <button class="cat-btn" onclick="filterMenu('gosht', this)">Go'sht</button>
+    <button class="cat-btn" onclick="filterMenu('jihozlar', this)">Jihozlar</button>
+  </div>
+
+  <div class="menu-grid" id="menuGrid">
+    <div class="menu-item" data-cat="komir">
+      <div class="menu-item-info">
+        <div class="menu-item-name">Qayin Ko'mir</div>
+        <div class="menu-item-desc">Premium sifat, tez yonadigan<br>10 kg qopda</div>
+      </div>
+      <div class="menu-item-price">45 000 so'm</div>
+    </div>
+    <div class="menu-item" data-cat="komir">
+      <div class="menu-item-info">
+        <div class="menu-item-name">Eman Ko'mir</div>
+        <div class="menu-item-desc">Uzoq tutadigan, kuchli issiqlik<br>10 kg qopda</div>
+      </div>
+      <div class="menu-item-price">55 000 so'm</div>
+    </div>
+    <div class="menu-item" data-cat="komir">
+      <div class="menu-item-info">
+        <div class="menu-item-name">Ko'mir Briket</div>
+        <div class="menu-item-desc">Portlash xavfsiz, bir xil yonish<br>5 kg qopda</div>
+      </div>
+      <div class="menu-item-price">38 000 so'm</div>
+    </div>
+    <div class="menu-item" data-cat="gosht">
+      <div class="menu-item-info">
+        <div class="menu-item-name">Qo'y Shashlik</div>
+        <div class="menu-item-desc">Yangi qo'y go'shti, kesib tayyorlangan<br>1 kg</div>
+      </div>
+      <div class="menu-item-price">95 000 so'm</div>
+    </div>
+    <div class="menu-item" data-cat="gosht">
+      <div class="menu-item-info">
+        <div class="menu-item-name">Tovuq Shashlik</div>
+        <div class="menu-item-desc">Toza tovuq go'shti, marinlangan<br>1 kg</div>
+      </div>
+      <div class="menu-item-price">65 000 so'm</div>
+    </div>
+    <div class="menu-item" data-cat="gosht">
+      <div class="menu-item-info">
+        <div class="menu-item-name">Mol Go'shti Shashlik</div>
+        <div class="menu-item-desc">Premium mol go'shti, aromatik<br>1 kg</div>
+      </div>
+      <div class="menu-item-price">85 000 so'm</div>
+    </div>
+    <div class="menu-item" data-cat="jihozlar">
+      <div class="menu-item-info">
+        <div class="menu-item-name">Mangal (Kichik)</div>
+        <div class="menu-item-desc">Yig'ma, olib yurish uchun qulay<br>6 shampurlik</div>
+      </div>
+      <div class="menu-item-price">120 000 so'm</div>
+    </div>
+    <div class="menu-item" data-cat="jihozlar">
+      <div class="menu-item-info">
+        <div class="menu-item-name">Shampurlar To'plami</div>
+        <div class="menu-item-desc">Zanglamaydigan po'lat<br>10 dona</div>
+      </div>
+      <div class="menu-item-price">35 000 so'm</div>
+    </div>
+    <div class="menu-item" data-cat="jihozlar">
+      <div class="menu-item-info">
+        <div class="menu-item-name">Shashlik To'plami</div>
+        <div class="menu-item-desc">Ko'mir + go'sht + ziravorlar<br>Tayyor bayram seti</div>
+      </div>
+      <div class="menu-item-price">280 000 so'm</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ORDER ══ -->
+<div class="page" id="order">
+  <p class="section-label" style="margin-bottom:16px;padding-top:40px">Buyurtma berish</p>
+  <h2 class="section-title" style="margin-bottom:48px">Tez va <em>qulay</em></h2>
+
+  <div class="order-grid">
+    <div>
+      <div class="form-group">
+        <label class="form-label">Ism va Familiya</label>
+        <input type="text" class="form-input" placeholder="Ismingizni kiriting" id="ord-name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefon raqami</label>
+        <input type="text" class="form-input" placeholder="+998 90 000 00 00" id="ord-phone">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mahsulot tanlang</label>
+        <select class="form-input" id="ord-product" onchange="updateSummary()">
+          <option value="">— tanlang —</option>
+          <option value="Qayin Ko'mir|45000">Qayin Ko'mir — 45 000 so'm</option>
+          <option value="Eman Ko'mir|55000">Eman Ko'mir — 55 000 so'm</option>
+          <option value="Ko'mir Briket|38000">Ko'mir Briket — 38 000 so'm</option>
+          <option value="Qo'y Shashlik|95000">Qo'y Shashlik — 95 000 so'm</option>
+          <option value="Tovuq Shashlik|65000">Tovuq Shashlik — 65 000 so'm</option>
+          <option value="Shashlik To'plami|280000">Shashlik To'plami — 280 000 so'm</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Miqdor (kg / dona)</label>
+        <input type="number" class="form-input" placeholder="1" min="1" value="1" id="ord-qty" onchange="updateSummary()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Yetkazib berish usuli</label>
+        <select class="form-input" id="ord-delivery" onchange="updateSummary()">
+          <option value="pickup">O'zi olib ketish</option>
+          <option value="delivery">Yetkazib berish (+15 000 so'm)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Manzil (yetkazib berish uchun)</label>
+        <input type="text" class="form-input" placeholder="Ko'cha, uy raqami" id="ord-address">
+      </div>
+      <button class="btn-primary" style="width:100%;padding:16px" onclick="placeOrder()">Buyurtma berish</button>
+    </div>
+
+    <div class="order-summary">
+      <div class="summary-title">Buyurtma ma'lumoti</div>
+      <div class="summary-row"><span class="label">Mahsulot</span><span class="value" id="sum-product">—</span></div>
+      <div class="summary-row"><span class="label">Miqdor</span><span class="value" id="sum-qty">—</span></div>
+      <div class="summary-row"><span class="label">Narx</span><span class="value" id="sum-price">—</span></div>
+      <div class="summary-row"><span class="label">Yetkazib berish</span><span class="value" id="sum-delivery">—</span></div>
+      <div class="summary-total">
+        <span>Jami</span>
+        <span class="price" id="sum-total">0 so'm</span>
+      </div>
+      <div style="margin-top:28px; padding-top:24px; border-top: 0.5px solid var(--border);">
+        <div style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--pink); margin-bottom:12px">Ish vaqti</div>
+        <div style="font-size:14px; color:rgba(255,255,255,0.6); line-height:2; font-weight:300">
+          Dushanba — Yakshanba<br>
+          08:00 — 22:00<br>
+          <span style="color:var(--pink)">33 ta filial</span> — siz yaqin biriga murojaat qiling
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTACT ══ -->
+<div class="page" id="contact">
+  <div class="contact-grid">
+    <div>
+      <p class="section-label">Aloqa</p>
+      <h2 class="section-title" style="margin-bottom:40px">Biz bilan <em>bog'laning</em></h2>
+
+      <div class="contact-info-block">
+        <div class="contact-info-label">Telefon</div>
+        <div class="contact-info-val">+998 71 000 00 00</div>
+        <div class="contact-info-sub">Har kuni 08:00 – 22:00</div>
+      </div>
+      <div class="contact-info-block">
+        <div class="contact-info-label">Telegram</div>
+        <div class="contact-info-val">@marino_uz</div>
+        <div class="contact-info-sub">Tez javob, buyurtma qabul</div>
+      </div>
+      <div class="contact-info-block">
+        <div class="contact-info-label">Instagram</div>
+        <div class="contact-info-val">@marino.shashlik</div>
+        <div class="contact-info-sub">Yangi mahsulotlar va aksiyalar</div>
+      </div>
+      <div class="contact-info-block">
+        <div class="contact-info-label">Manzil (Bosh ofis)</div>
+        <div class="contact-info-val">Toshkent, Chilonzor tumani</div>
+        <div class="contact-info-sub">Bosh ofis va markaziy ombor</div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-label" style="margin-bottom:20px">33 ta filialimiz</p>
+      <div class="branches-list">
+        <div class="branch-tag">Chilonzor</div>
+        <div class="branch-tag">Yunusobod</div>
+        <div class="branch-tag">Mirzo Ulug'bek</div>
+        <div class="branch-tag">Shayxontohur</div>
+        <div class="branch-tag">Yakkasaroy</div>
+        <div class="branch-tag">Uchtepa</div>
+        <div class="branch-tag">Bektemir</div>
+        <div class="branch-tag">Olmazor</div>
+        <div class="branch-tag">Yashnobod</div>
+        <div class="branch-tag">Sergeli</div>
+        <div class="branch-tag">Zangiota</div>
+        <div class="branch-tag">Qibray</div>
+        <div class="branch-tag">Bo'stonliq</div>
+        <div class="branch-tag">Parkent</div>
+        <div class="branch-tag">Ohangaron</div>
+        <div class="branch-tag">+ 18 ta ko'proq</div>
+      </div>
+      <div style="margin-top:40px; padding:28px; border: 0.5px solid var(--border);">
+        <div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:700; margin-bottom:12px">Yangi filial ochasizmi?</div>
+        <div style="font-size:13px; color:var(--gray); font-weight:300; line-height:1.7; margin-bottom:20px">Franchise va hamkorlik bo'yicha murojaat qiling</div>
+        <button class="btn-primary" onclick="showToast('Murojaat yuborildi!')">Murojaat yuborish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">MAR<span>I</span>NO</div>
+  <div class="footer-copy">© 2025 Marino. Toshkent · Shashlik & Ko'mir</div>
+</footer>
+
+<script>
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.getElementById('nav-' + id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function filterMenu(cat, btn) {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.style.display = (cat === 'all' || item.dataset.cat === cat) ? 'flex' : 'none';
+    });
+  }
+
+  function formatNum(n) {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+
+  function updateSummary() {
+    const sel = document.getElementById('ord-product').value;
+    const qty = parseInt(document.getElementById('ord-qty').value) || 1;
+    const del = document.getElementById('ord-delivery').value;
+
+    if (!sel) {
+      document.getElementById('sum-product').textContent = '—';
+      document.getElementById('sum-qty').textContent = '—';
+      document.getElementById('sum-price').textContent = '—';
+      document.getElementById('sum-delivery').textContent = '—';
+      document.getElementById('sum-total').textContent = '0 so\'m';
+      return;
+    }
+
+    const [name, priceStr] = sel.split('|');
+    const unitPrice = parseInt(priceStr);
+    const deliveryCost = del === 'delivery' ? 15000 : 0;
+    const total = unitPrice * qty + deliveryCost;
+
+    document.getElementById('sum-product').textContent = name;
+    document.getElementById('sum-qty').textContent = qty + ' dona/kg';
+    document.getElementById('sum-price').textContent = formatNum(unitPrice * qty) + ' so\'m';
+    document.getElementById('sum-delivery').textContent = del === 'delivery' ? '15 000 so\'m' : 'Bepul (o\'zi olish)';
+    document.getElementById('sum-total').textContent = formatNum(total) + ' so\'m';
+  }
+
+  function placeOrder() {
+    const name = document.getElementById('ord-name').value.trim();
+    const phone = document.getElementById('ord-phone').value.trim();
+    const product = document.getElementById('ord-product').value;
+    if (!name || !phone || !product) {
+      showToast('Iltimos, barcha maydonlarni to\'ldiring!');
+      return;
+    }
+    showToast('✓ Buyurtmangiz qabul qilindi!');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
